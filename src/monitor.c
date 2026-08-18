@@ -27,10 +27,47 @@ const char *estado_como_texto(EstadoLeitura estado) {
 }
 
 bool calcular_estatisticas(const Sensor *sensor, Estatisticas *resultado) {
-    /* ETAPA 02: calcule mínima, máxima e média das leituras válidas. */
-    (void)sensor;
-    (void)resultado;
-    return false;
+    if (sensor == NULL || resultado == NULL) {
+        return false;
+    }
+
+    resultado->minima = 0.0;
+    resultado->maxima = 0.0;
+    resultado->media = 0.0;
+
+    size_t validos = 0;
+    double soma = 0.0;
+    double minima_temp = 0.0;
+    double maxima_temp = 0.0;
+    bool primeira = true;
+
+    for (size_t i = 0; i < sensor->quantidade; i++) {
+        double valor = sensor->leituras[i];
+        if (leitura_valida(valor)) {
+            soma += valor;
+            if (primeira) {
+                minima_temp = valor;
+                maxima_temp = valor;
+                primeira = false;
+            } else {
+                if (valor < minima_temp) minima_temp = valor;
+                if (valor > maxima_temp) maxima_temp = valor;
+            }
+            validos++;
+        }
+    }
+
+    if (validos > 0) {
+        resultado->minima = minima_temp;
+        resultado->maxima = maxima_temp;
+        resultado->media = soma / validos;
+        return true;
+    } else {
+        resultado->minima = 0.0;
+        resultado->maxima = 0.0;
+        resultado->media = 0.0;
+        return false;
+    }
 }
 
 bool sensor_adicionar_leitura(Sensor *sensor, double valor) {
