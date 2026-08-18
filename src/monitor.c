@@ -34,6 +34,9 @@ bool calcular_estatisticas(const Sensor *sensor, Estatisticas *resultado) {
     if (sensor == NULL || resultado == NULL) {
         return false;
     }
+    if (sensor->quantidade > MAX_LEITURAS) {
+        return false;
+    }
 
     resultado->minima = 0.0;
     resultado->maxima = 0.0;
@@ -75,10 +78,13 @@ bool calcular_estatisticas(const Sensor *sensor, Estatisticas *resultado) {
 }
 
 bool sensor_adicionar_leitura(Sensor *sensor, double valor) {
-    /* ETAPA 03: valide os ponteiros, a leitura e a capacidade do vetor. */
-    (void)sensor;
-    (void)valor;
-    return false;
+    if (sensor == NULL) return false;
+    if (sensor->quantidade >= MAX_LEITURAS) return false;
+    if (!leitura_valida(valor)) return false;
+
+    sensor->leituras[sensor->quantidade] = valor;
+    sensor->quantidade++;
+    return true;
 }
 
 void exibir_relatorio(const Sensor *sensor) {
